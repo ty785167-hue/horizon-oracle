@@ -4,36 +4,35 @@
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanmei AI Oracle - Standard Edition</title>
+    <title>Sanmei AI Oracle - Safe Edition</title>
     <style>
         :root { --accent: #ffd700; --gold-glow: rgba(212, 175, 55, 0.4); --text: #e2e8f0; }
-        body { font-family: "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 10px; line-height: 1.6; min-height: 100vh; color: var(--text); background: #020617; }
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif; margin: 0; padding: 10px; line-height: 1.6; min-height: 100vh; color: var(--text); background: #020617; }
         .container { max-width: 650px; margin: 0 auto; }
-        header { padding: 30px 0; text-align: center; }
+        header { padding: 40px 0 20px; text-align: center; }
         .consult-area { background: rgba(15, 23, 42, 0.8); padding: 25px; border-radius: 20px; border: 1.5px solid var(--accent); box-shadow: 0 0 30px var(--gold-glow); }
-        .api-key-box { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--accent); text-align: center; }
-        .api-input { background: #000; border: 1px solid var(--accent); color: #0f0; padding: 12px; width: 90%; border-radius: 6px; font-family: monospace; font-size: 0.8rem; text-align: center; }
+        .api-box { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--accent); text-align: center; }
+        .api-input { background: #000; border: 1px solid var(--accent); color: #0f0; padding: 10px; width: 85%; border-radius: 6px; font-family: monospace; font-size: 0.8rem; text-align: center; }
         textarea { width: 100%; height: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; padding: 15px; box-sizing: border-box; font-size: 1rem; margin-bottom: 15px; outline: none; }
         .btn-action { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; border: none; padding: 15px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem; }
-        #ai-response { margin-top: 25px; display: none; background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); white-space: pre-wrap; line-height: 1.8; text-align: left; }
+        #ai-response { margin-top: 25px; display: none; background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); white-space: pre-wrap; text-align: left; }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <div id="display-date" style="font-weight:bold; font-size: 1.2rem;">--月--日</div>
-        <div id="kanshi-today" style="margin-top:10px; font-weight:bold; color: var(--accent);">干支算出中...</div>
+        <div id="display-date" style="font-size: 1.2rem; font-weight: bold;">--月--日</div>
+        <div id="kanshi-today" style="color: var(--accent); font-weight: bold;">今日の干支: 算出中...</div>
     </header>
 
     <div class="consult-area">
-        <div class="api-key-box">
-            <div style="font-size:0.8rem; color:var(--accent); margin-bottom:8px; font-weight:bold;">1. APIキーを貼り付けて保存</div>
-            <input type="password" id="api-key" class="api-input" placeholder="キーを貼り付けてEnter" onchange="saveKey()">
-            <div id="status" style="font-size:0.7rem; margin-top:5px; color:#0f0; display:none;">✓ キーを記憶しました</div>
+        <div class="api-box">
+            <div style="font-size:0.8rem; color:var(--accent); margin-bottom:8px;">1. お持ちの「AQ...」で始まるキーを貼り付けてEnter</div>
+            <input type="password" id="api-key" class="api-input" placeholder="ここに貼り付けてください" onchange="saveKey()">
+            <div id="status" style="font-size:0.7rem; margin-top:5px; color:#0f0; display:none;">✓ キーを保存しました（お使いのブラウザのみで有効）</div>
         </div>
 
-        <div style="font-weight:bold; color:var(--accent); margin-bottom:10px; text-align:center;">2. 相談内容を入力</div>
-        <textarea id="user-input" placeholder="例：今日はどんな日？ 連絡してもいい？"></textarea>
+        <textarea id="user-input" placeholder="相談内容を入力..."></textarea>
         <button id="submit-btn" class="btn-action" onclick="askAI()">星の導きを聞く</button>
         <div id="ai-response"></div>
     </div>
@@ -47,30 +46,35 @@
 
     function saveKey() {
         const val = document.getElementById('api-key').value.trim();
-        localStorage.setItem('gemini_api_key', val);
-        document.getElementById('status').style.display = val ? "block" : "none";
+        localStorage.setItem('my_secret_key', val);
+        document.getElementById('status').style.display = "block";
     }
 
     window.onload = () => {
-        const saved = localStorage.getItem('gemini_api_key');
+        const saved = localStorage.getItem('my_secret_key');
         if(saved) {
             document.getElementById('api-key').value = saved;
             document.getElementById('status').style.display = "block";
         }
-        refreshAll();
+        const now = new Date();
+        const anchor = new Date(2000, 0, 1);
+        const diff = Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate())) / 86400000);
+        const todayK = KANSHI[(diff + 54) % 60];
+        document.getElementById('display-date').innerText = (now.getMonth()+1) + "月" + now.getDate() + "日";
+        document.getElementById('kanshi-today').innerText = "今日の干支: " + todayK;
     };
 
     async function askAI() {
-        const key = document.getElementById('api-key').value.trim();
+        const key = localStorage.getItem('my_secret_key');
         const input = document.getElementById('user-input').value;
         const resDiv = document.getElementById('ai-response');
-        if (!key) return alert("APIキーを入力してください");
+        if (!key) return alert("まずは上の枠にAPIキーを貼り付けて保存してください");
 
         resDiv.style.display = "block";
-        resDiv.innerHTML = "星の配置を読み解いています...";
-
+        resDiv.innerHTML = "AI鑑定士が星を読み解いています...";
+        
         const todayK = document.getElementById('kanshi-today').innerText;
-        const prompt = `あなたは算命学鑑定士です。1979/11/30生まれ男性(辛丑)の相談に、今日(${todayK})の運勢を交えて答えて。相談：${input}`;
+        const prompt = `あなたはプロの算命学鑑定士です。1979/11/30生まれ男性(辛丑)の相談に、今日(${todayK})の運勢を交えて答えて。相談内容：${input}`;
 
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
@@ -79,8 +83,7 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
             const data = await response.json();
-            
-            if (data.error) {
+            if(data.error) {
                 resDiv.innerHTML = "エラー: " + data.error.message;
             } else {
                 resDiv.innerHTML = data.candidates[0].content.parts[0].text;
@@ -88,14 +91,6 @@
         } catch (e) {
             resDiv.innerHTML = "通信エラーが発生しました。";
         }
-    }
-
-    function refreshAll() {
-        const now = new Date();
-        const anchor = new Date(2000, 0, 1);
-        const diff = Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate())) / 86400000);
-        document.getElementById('display-date').innerText = (now.getMonth()+1) + "月" + now.getDate() + "日";
-        document.getElementById('kanshi-today').innerText = "今日の干支: " + KANSHI[(diff + 54) % 60];
     }
 </script>
 </body>
