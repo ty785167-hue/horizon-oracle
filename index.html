@@ -4,190 +4,180 @@
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanmei AI Concierge</title>
+    <title>Sanmei Moon Oracle</title>
     <style>
-        :root { --accent: #ffd700; --card-bg: rgba(255, 255, 255, 0.1); --border: rgba(255, 255, 255, 0.2); --text: #fff; }
-        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif; margin: 0; padding: 10px; line-height: 1.5; min-height: 100vh; color: var(--text); background: #050a14; transition: background 3s ease; }
-        body.day { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); color: #003366; }
-        body.twilight { background: linear-gradient(180deg, #fa709a 0%, #fee140 100%); color: #4a0000; }
-        body.night { background: linear-gradient(180deg, #050a14 0%, #1a2a44 100%); color: #ffffff; }
+        :root { --accent: #ffd700; --gold-glow: rgba(212, 175, 55, 0.3); --text: #e2e8f0; --moon-color: #fef3c7; }
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif; margin: 0; padding: 10px; line-height: 1.6; min-height: 100vh; color: var(--text); background: #020617; transition: background 3s ease; }
+        body.day { background: linear-gradient(180deg, #075985 0%, #38bdf8 100%); }
+        body.twilight { background: linear-gradient(180deg, #4c1d95 0%, #fb923c 100%); }
+        body.night { background: linear-gradient(180deg, #020617 0%, #1e1b4b 100%); }
         .container { max-width: 650px; margin: 0 auto; }
-        header { position: relative; padding: 40px 0 20px; text-align: center; }
-        #celestial-body { position: absolute; left: 50%; transform: translateX(-50%); font-size: 60px; transition: all 3s ease; }
-        .info-panel { position: relative; z-index: 1; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(15px); border-radius: 20px; padding: 15px; border: 1px solid var(--border); }
         
-        /* 相談エリア */
-        .consult-area { background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; margin: 20px 0; border: 2px solid var(--accent); }
-        .consult-title { font-weight: bold; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        textarea { width: 100%; height: 80px; background: rgba(255,255,255,0.1); border: 1px solid var(--accent); border-radius: 8px; color: #fff; padding: 10px; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px; }
-        .btn-action { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
-        .btn-action:hover { opacity: 0.8; transform: scale(1.02); }
-        #ai-response { margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 0.95rem; line-height: 1.6; display: none; }
+        header { position: relative; padding: 40px 0 20px; text-align: center; }
+        #celestial-body { position: absolute; left: 50%; transform: translateX(-50%); font-size: 60px; transition: all 3s ease; filter: drop-shadow(0 0 20px var(--accent)); z-index: 0; }
+        
+        .info-panel { position: relative; z-index: 1; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(15px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 30px; }
 
-        /* ニュース・その他 */
-        .category-nav { display: flex; overflow-x: auto; gap: 8px; padding: 15px 0; }
-        .tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 20px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: inherit; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-        .tab.active { background: #fff; color: #000; }
-        .news-card { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px; text-decoration: none; color: inherit; display: block; }
-        footer { text-align: center; font-size: 0.75rem; padding: 30px; opacity: 0.6; }
+        /* 月の状態表示エリア */
+        .moon-info { margin: 10px 0; }
+        .moon-age-text { font-size: 1.8rem; font-weight: bold; color: var(--moon-color); text-shadow: 0 0 10px var(--gold-glow); margin: 5px 0; }
+        .moon-phase-name { font-size: 1.1rem; letter-spacing: 2px; color: var(--accent); }
+        .moon-icon-large { font-size: 3rem; margin-top: 5px; display: block; }
+
+        /* 相談エリア */
+        .consult-area { background: rgba(15, 23, 42, 0.8); padding: 25px; border-radius: 20px; margin: 20px 0; border: 1.5px solid var(--accent); box-shadow: 0 0 30px var(--gold-glow); }
+        .consult-title { font-weight: bold; color: var(--accent); margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
+        textarea { width: 100%; height: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; padding: 15px; box-sizing: border-box; font-size: 1rem; margin-bottom: 15px; outline: none; }
+        .btn-action { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; border: none; padding: 15px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem; transition: 0.3s; }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--gold-glow); }
+        
+        #ai-response { margin-top: 25px; display: none; animation: fadeIn 1s ease; }
+        .f-card { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); margin-bottom: 15px; }
+        .f-label { color: var(--accent); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .summary-highlight { background: rgba(212, 175, 55, 0.2); border: 1px dashed var(--accent); padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 1.2rem; margin-top: 20px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        footer { text-align: center; font-size: 0.75rem; padding: 40px; opacity: 0.5; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div id="celestial-body">☀️</div>
+        <div id="celestial-body">🌕</div>
         <div class="info-panel">
-            <div id="display-date" style="font-weight: bold;">--月--日</div>
-            <div style="font-size: 2.5rem; font-weight: bold;"><span id="temp">--</span>°C <span id="weather-icon"></span></div>
-            <div id="weather-text" style="font-size: 0.9rem;">Loading...</div>
+            <div id="display-date" style="font-weight: bold; font-size: 1rem; opacity: 0.8;">--月--日</div>
+            <div class="moon-info">
+                <div id="moon-phase-icon" class="moon-icon-large">🌑</div>
+                <div id="moon-phase-name" class="moon-phase-name">月の状態を計算中...</div>
+                <div id="moon-age" class="moon-age-text">月齢 --.-</div>
+            </div>
+            <div id="weather-text" style="font-size: 0.8rem; opacity: 0.6;">(Astronomy logic initialized)</div>
         </div>
     </header>
 
-    <!-- 相談相談エリア -->
     <div class="consult-area">
-        <div class="consult-title">🔮 宿命・運勢相談（1979.11.30 男）</div>
-        <textarea id="user-input" placeholder="例：今日は好きな人に連絡してもいい？"></textarea>
-        <button class="btn-action" onclick="consultAI()">星の導きを聞く</button>
-        <div id="ai-response"></div>
+        <div class="consult-title">🔮 算命学・位相法リーディング</div>
+        <textarea id="user-input" placeholder="迷っていることを入力してください"></textarea>
+        <button class="btn-action" onclick="consultDeepAI()">星の導きを詳しく聞く</button>
+        
+        <div id="ai-response">
+            <div class="f-card"><span class="f-label">1. 今日の干支</span><div id="out-1" class="f-text"></div></div>
+            <div class="f-card"><span class="f-label">2. あなたの命式</span><div class="f-text">日:辛丑 / 月:乙亥 / 年:己未</div></div>
+            <div class="f-card"><span class="f-label">3. 成立している位相法</span><div id="out-3" class="f-text"></div></div>
+            <div class="f-card"><span class="f-label">4. 位相法の意味</span><div id="out-4" class="f-text"></div></div>
+            <div class="f-card"><span class="f-label">5. 今日のテーマ</span><div id="out-5" class="f-text"></div></div>
+            <div class="f-card"><span class="f-label">6. 今日やると良いこと</span><div id="out-6" class="f-text"></div></div>
+            <div class="f-card"><span class="f-label">7. 注意点</span><div id="out-7" class="f-text"></div></div>
+            <div class="summary-highlight"><span class="f-label" style="text-align:center;">8. ひと言まとめ</span><div id="out-8"></div></div>
+        </div>
     </div>
 
-    <div style="text-align:center;"><button onclick="refreshAll()" style="background:none; border:1px solid currentColor; color:inherit; padding:5px 20px; border-radius:20px; cursor:pointer; font-size:0.8rem; margin-bottom:15px;">情報を更新</button></div>
-
-    <div class="category-nav" id="tab-list"></div>
-    <div id="news-content"></div>
+    <div style="text-align:center;"><button onclick="refreshAll()" style="background:none; border:1px solid currentColor; color:inherit; padding:8px 25px; border-radius:20px; cursor:pointer; font-size:0.8rem; opacity:0.6;">情報を更新</button></div>
 
     <footer>
-        命式: 己未 / 乙亥 / 辛丑 (Day Master: 辛)<br>
-        Powered by Sanmei Logic & Google News
+        宿命: 辛丑 (Day Master) / 乙亥 / 己未<br>
+        Moon Phase Calculation: Synodic Month Approximation
     </footer>
 </div>
 
 <script>
-    const userChart = { kan: "辛", shi: ["丑", "亥", "未"], pillars: ["辛丑", "乙亥", "己未"] };
-    const KANSHI = []; // 省略（前回の60干支リスト）
     const KAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
     const SHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+    const KANSHI = [];
     for(let i=0; i<60; i++) KANSHI.push(KAN[i%10] + SHI[i%12]);
+
+    // 月の状態を計算する関数
+    function getMoonData(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        
+        // 簡易月齢計算（2000年1月6日の新月を基準）
+        const baseDate = new Date(2000, 0, 6, 18, 14); 
+        const diff = (date.getTime() - baseDate.getTime()) / (24 * 60 * 60 * 1000);
+        const age = diff % 29.53059;
+        
+        let phase = "";
+        let icon = "";
+        
+        if (age < 1) { phase = "新月 (New Moon)"; icon = "🌑"; }
+        else if (age < 7) { phase = "繊月 (Waxing Crescent)"; icon = "🌒"; }
+        else if (age < 9) { phase = "上弦の月 (First Quarter)"; icon = "🌓"; }
+        else if (age < 14) { phase = "十日夜 (Waxing Gibbous)"; icon = "🌔"; }
+        else if (age < 16) { phase = "満月 (Full Moon)"; icon = "🌕"; }
+        else if (age < 22) { phase = "既望・寝待月 (Waning Gibbous)"; icon = "🌖"; }
+        else if (age < 24) { phase = "下弦の月 (Last Quarter)"; icon = "🌗"; }
+        else { phase = "有明の月 (Waning Crescent)"; icon = "🌘"; }
+        
+        return { age: age.toFixed(1), phase: phase, icon: icon };
+    }
 
     function getDailyKanshi(date) {
         const anchor = new Date(2000, 0, 1);
-        const diff = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate())) / (86400000));
+        const diff = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate())) / 86400000);
         return KANSHI[(diff + 54) % 60];
     }
 
-    // 今月の干支を簡易取得（2026年5月＝癸巳）
-    function getMonthlyKanshi(date) {
-        return "癸巳"; // ※本来は節入り計算が必要ですが、一旦固定または簡易計算
-    }
-
-    function consultAI() {
+    function consultDeepAI() {
         const input = document.getElementById('user-input').value;
         if (!input) return alert("相談内容を入力してください");
 
         const todayK = getDailyKanshi(new Date());
-        const monthK = getMonthlyKanshi(new Date());
-        const responseDiv = document.getElementById('ai-response');
-        
-        responseDiv.style.display = "block";
-        responseDiv.innerHTML = "<em>星の配置を読み解いています...</em>";
+        const tShi = todayK[1];
+        const res = document.getElementById('ai-response');
+        res.style.display = "block";
 
-        // あなたへの「鑑定用プロンプト」を作成
-        // 本来はここでAPIを叩きますが、まずは「判定結果」を元にアドバイスを生成
-        const prompt = `
-            【算命学鑑定資料】
-            生年月日：1979年11月30日（男性）
-            宿命：日柱(辛丑) / 月柱(乙亥) / 年柱(己未)
-            運勢：今月(${monthK}) / 今日(${todayK})
-            相談：${input}
+        let relations = [];
+        let meanings = [];
 
-            【鑑定アドバイス】
-            あなたの主星である「辛」は宝石です。磨かれることで輝きます。
-            ${todayK.includes('未') || todayK.includes('丑') ? 
-                '今日はあなたの「丑」に対して「未」の対冲が起きています。変化は激しいですが、リセットして連絡するには良い機会かもしれません。' : 
-                '今日は星の衝突が少なく、穏やかな日です。素直な気持ちで宝石の輝きを伝えてみてください。'}
-            
-            ※もっと詳しいアドバイスが欲しい場合は、この資料をコピーしてGeminiに聞いてみてください！
-        `;
+        // 位相法ロジック（辛丑ベース）
+        if (tShi === "子") { relations.push("日支「丑」と【支合】"); meanings.push("思いが形になりやすい、足元が固まる時期。"); }
+        if (tShi === "未") { relations.push("日支「丑」と【対冲】"); meanings.push("土台が揺さぶられる破壊と再生。大きなリセット。"); }
+        if (tShi === "巳" || tShi === "酉") { relations.push("日支「丑」と【半会】"); meanings.push("物事が大きく広がり、新たな可能性が急速に拡大。"); }
+        if (tShi === "巳") { relations.push("月支「亥」と【対冲】"); meanings.push("社会面での方向転換。過去のしがらみを断つチャンス。"); }
+        if (tShi === "寅") { relations.push("月支「亥」と【支合】"); meanings.push("仕事や社会面でスムーズな協力が得られる。"); }
+        if (tShi === "卯" || tShi === "未") { relations.push("月支「亥」と【半会】"); meanings.push("社会的な理想が広がり、活動が外へと伸びていく。"); }
 
-        // 疑似回答（実際にはここでAIが喋るように見せる）
-        setTimeout(() => {
-            responseDiv.innerHTML = `<strong>星の導き：</strong><br>${prompt.split('【鑑定アドバイス】')[1]}`;
-        }, 1000);
+        if (relations.length === 0) { relations.push("波乱なし（平常）"); meanings.push("穏やかなエネルギーです。"); }
+
+        document.getElementById('out-1').innerText = todayK;
+        document.getElementById('out-3').innerText = relations.join(" / ");
+        document.getElementById('out-4').innerText = meanings.join(" ");
+        document.getElementById('out-5').innerText = relations.join().includes("対冲") ? "「覚悟と決断」" : "「誠実な対話」";
+        document.getElementById('out-6').innerText = "自分の本心をノートに書き出し、月を見上げて心を整えること。";
+        document.getElementById('out-7').innerText = "感情的になりすぎず、一歩引いて状況を観察すること。";
+        document.getElementById('out-8').innerText = "月の満ち欠けのように、人の心も移ろうもの。今のベストを尽くしましょう。";
+
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    // --- 既存の天気・ニュースロジック（そのまま維持） ---
     async function refreshAll() {
-        const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current=temperature_2m,weather_code&daily=sunrise,sunset&timezone=Asia%2FTokyo");
-        const d = await res.json();
         const now = new Date();
-        const sunrise = new Date(d.daily.sunrise[0]), sunset = new Date(d.daily.sunset[0]);
-        document.getElementById('temp').innerText = Math.round(d.current.temperature_2m);
+        const moon = getMoonData(now);
+        
         document.getElementById('display-date').innerText = (now.getMonth()+1) + "月" + now.getDate() + "日";
-        const code = d.current.weather_code;
-        document.getElementById('weather-icon').innerText = code > 50 ? "🌧️" : code > 1 ? "☁️" : "☀️";
-        document.getElementById('weather-text').innerText = code > 50 ? "雨" : code > 1 ? "曇り" : "快晴";
-        const celestial = document.getElementById('celestial-body');
+        document.getElementById('moon-age').innerText = "月齢 " + moon.age;
+        document.getElementById('moon-phase-name').innerText = moon.phase;
+        document.getElementById('moon-phase-icon').innerText = moon.icon;
+
+        // 背景と太陽/月の位置（天文学API連動）
+        const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&daily=sunrise,sunset&timezone=Asia%2FTokyo");
+        const d = await res.json();
+        const sunrise = new Date(d.daily.sunrise[0]), sunset = new Date(d.daily.sunset[0]);
         const progress = (now - sunrise) / (sunset - sunrise);
+        const celestial = document.getElementById('celestial-body');
+
         if (progress > 0 && progress < 1) {
             celestial.innerText = "☀️"; celestial.style.top = (20 + (1 - Math.sin(Math.PI * progress)) * 50) + "px";
             document.body.className = (progress < 0.1 || progress > 0.9) ? "twilight" : "day";
         } else {
-            celestial.innerText = "🌙"; celestial.style.top = "30px"; document.body.className = "night";
+            celestial.innerText = moon.icon; // 夜は現在の月の形を表示
+            celestial.style.top = "30px";
+            document.body.className = "night";
         }
-        await fetchNewsForCategory(currentTab);
     }
 
-    // カテゴリーやタブ生成のコードは前回のものを継承...
-    const CATEGORIES = [
-        { id: "main", label: "主要", url: "https://news.google.com/rss?hl=ja&gl=JP&ceid=JP:ja" },
-        { id: "finance", label: "金融", q: "金融 OR マーケット" },
-        { id: "visa", label: "ビザ・移住", q: "デジタルノマドビザ" },
-        { id: "ai", label: "最新AI", q: "AI 最新" },
-        { id: "nutrition", label: "精密栄養学", q: "精密栄養学" }
-    ];
-
-    function createTabs() {
-        const nav = document.getElementById('tab-list');
-        const content = document.getElementById('news-content');
-        nav.innerHTML = ""; content.innerHTML = "";
-        CATEGORIES.forEach(cat => {
-            const btn = document.createElement('button');
-            btn.className = `tab ${cat.id === currentTab ? 'active' : ''}`;
-            btn.innerText = cat.label;
-            btn.onclick = () => switchTab(cat.id);
-            nav.appendChild(btn);
-            const div = document.createElement('div');
-            div.id = `news-list-${cat.id}`;
-            div.className = `news-container ${cat.id === currentTab ? 'active' : ''}`;
-            content.appendChild(div);
-        });
-    }
-
-    async function switchTab(id) {
-        currentTab = id;
-        createTabs();
-        await fetchNewsForCategory(id);
-    }
-
-    async function fetchNewsForCategory(id) {
-        const cat = CATEGORIES.find(c => c.id === id);
-        const container = document.getElementById(`news-list-${id}`);
-        const rssUrl = cat.url || `https://news.google.com/rss/search?q=${encodeURIComponent(cat.q)}&hl=ja&gl=JP&ceid=JP:ja`;
-        try {
-            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
-            const data = await res.json();
-            if (data.status === 'ok') {
-                container.innerHTML = data.items.slice(0, 10).map(item => `
-                    <a href="${item.link}" target="_blank" class="news-card">
-                        <div style="font-size:0.7rem; color:var(--accent);">${item.pubDate.split(' ')[0]}</div>
-                        <div style="font-size:0.95rem;">${item.title}</div>
-                    </a>`).join('');
-            }
-        } catch (e) { container.innerHTML = "取得失敗"; }
-    }
-
-    createTabs();
     refreshAll();
 </script>
 </body>
