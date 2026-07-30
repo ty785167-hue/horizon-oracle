@@ -13,11 +13,8 @@
         #celestial-body { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); font-size: 70px; filter: drop-shadow(0 0 20px var(--moon-color)); z-index: 1; }
         .info-panel { position: relative; z-index: 2; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 40px; }
         .consult-area { background: rgba(15, 23, 42, 0.8); padding: 25px; border-radius: 20px; margin: 20px 0; border: 1.5px solid var(--accent); box-shadow: 0 0 30px var(--gold-glow); }
-        
-        /* APIキー入力欄を目立たせる */
         .api-key-box { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--accent); text-align: center; }
         .api-input { background: #000; border: 1px solid var(--accent); color: #0f0; padding: 10px; width: 80%; border-radius: 6px; font-family: monospace; font-size: 0.9rem; text-align: center; }
-        
         textarea { width: 100%; height: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; padding: 15px; box-sizing: border-box; font-size: 1rem; margin-bottom: 15px; outline: none; }
         .btn-action { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; border: none; padding: 15px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem; transition: 0.3s; }
         #ai-response { margin-top: 25px; display: none; background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); white-space: pre-wrap; line-height: 1.8; text-align: left; }
@@ -29,21 +26,20 @@
         <div id="celestial-body">🌕</div>
         <div class="info-panel">
             <div id="display-date" style="font-weight:bold; color:var(--moon-color);">--月--日</div>
-            <div id="moon-phase-name" style="color:var(--accent);">Calculating Moon...</div>
+            <div id="moon-phase-name" style="color:var(--accent);">算命学 AI 鑑定デスク</div>
             <div id="kanshi-today" style="margin-top:10px; font-weight:bold;">今日の干支: --</div>
         </div>
     </header>
 
     <div class="consult-area">
-        <!-- ここにAPIキー入力欄を配置しました -->
         <div class="api-key-box">
-            <div style="font-size:0.8rem; color:var(--accent); margin-bottom:8px; font-weight:bold;">1. 最初にGemini APIキーを貼り付けて保存</div>
-            <input type="password" id="api-key" class="api-input" placeholder="AIza...で始まるキーを貼り付け" onchange="saveKey()">
-            <div style="font-size:0.7rem; margin-top:5px; opacity:0.7;">※貼り付けてEnterキーを押すと保存されます</div>
+            <div style="font-size:0.8rem; color:var(--accent); margin-bottom:8px; font-weight:bold;">1. Gemini APIキーを貼り付け</div>
+            <input type="password" id="api-key" class="api-input" placeholder="AIza...を貼り付け" oninput="saveKey()">
+            <div id="key-status" style="font-size:0.7rem; margin-top:5px; color:#0f0; display:none;">✓ キーを記憶しました</div>
         </div>
 
         <div style="font-weight:bold; color:var(--accent); margin-bottom:10px; text-align:center;">2. 相談内容を入力</div>
-        <textarea id="user-input" placeholder="例：5年ぶりに連絡が来た人に返信してもいい？"></textarea>
+        <textarea id="user-input" placeholder="例：今日はどんな日になる？ 5年ぶりの連絡、返信してもいい？"></textarea>
         <button id="submit-btn" class="btn-action" onclick="askAI()">星の導きを詳しく聞く</button>
         
         <div id="ai-response"></div>
@@ -57,21 +53,17 @@
     for(let i=0; i<60; i++) KANSHI.push(KAN[i%10] + SHI[i%12]);
 
     function saveKey() { 
-        localStorage.setItem('gemini_api_key', document.getElementById('api-key').value); 
-        alert("APIキーを保存しました！");
+        const key = document.getElementById('api-key').value;
+        localStorage.setItem('gemini_api_key', key); 
+        document.getElementById('key-status').style.display = key ? "block" : "none";
     }
+    
     window.onload = () => { 
-        document.getElementById('api-key').value = localStorage.getItem('gemini_api_key') || ''; 
+        const savedKey = localStorage.getItem('gemini_api_key') || '';
+        document.getElementById('api-key').value = savedKey;
+        if(savedKey) document.getElementById('key-status').style.display = "block";
         refreshAll(); 
     };
-
-    function getMoonData(date) {
-        const baseDate = new Date(2000, 0, 6, 18, 14); 
-        const diff = (date.getTime() - baseDate.getTime()) / 86400000;
-        const age = diff % 29.53059;
-        let icon = "🌕";
-        return { age: age.toFixed(1), icon: "🌕" };
-    }
 
     function getDailyKanshi(date) {
         const anchor = new Date(2000, 0, 1);
@@ -85,15 +77,22 @@
         const resDiv = document.getElementById('ai-response');
         const btn = document.getElementById('submit-btn');
 
-        if (!key) return alert("APIキーを先に入力してください");
-        if (!input) return alert("質問を入力してください");
+        if (!key) return alert("APIキーを貼り付けてください");
+        if (!input) return alert("相談内容を入力してください");
 
         resDiv.style.display = "block";
-        resDiv.innerHTML = "星の配置をAIが深く読み解いています...";
+        resDiv.innerHTML = "星の配置と宿命をAIが深く読み解いています。少々お待ちください...";
         btn.disabled = true;
 
         const todayK = getDailyKanshi(new Date());
-        const prompt = `あなたは算命学鑑定士です。1979年11月30日生まれ男性（辛丑・乙亥・己未）の相談に、今日（${todayK}）の運勢を交えて答えて。相談：${input}`;
+        
+        // ★鑑定士としての指示（プロンプト）をより詳細に
+        const prompt = `あなたは一流の算命学鑑定士です。以下の相談者に、位相法の知見を駆使して親身にアドバイスしてください。
+【相談者の宿命】生年月日: 1979年11月30日(男性), 日干支: 辛丑, 月干支: 乙亥, 年干支: 己未
+【今日の日時】2026年7月30日, 今日の干支: ${todayK}
+【今日のポイント】月支「亥」と今日「巳」が対冲、日支「丑」と今日「巳」が半会しています。
+【相談】${input}
+【指示】1.今日の星の状況を説明、2.相談への具体的な回答、3.開運アクション、の順に200〜400文字程度で分かりやすく回答してください。`;
 
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
@@ -102,9 +101,14 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
             const data = await response.json();
-            resDiv.innerHTML = data.candidates[0].content.parts[0].text;
+            
+            if (data.error) {
+                resDiv.innerHTML = "エラー: " + data.error.message;
+            } else {
+                resDiv.innerHTML = data.candidates[0].content.parts[0].text;
+            }
         } catch (e) {
-            resDiv.innerHTML = "エラー：APIキーが正しいか、Google AI Studioの設定を確認してください。";
+            resDiv.innerHTML = "通信エラーが発生しました。ネット接続を確認してください。";
         } finally { btn.disabled = false; }
     }
 
