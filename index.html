@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanmei AI Oracle - Debug Version</title>
+    <title>Sanmei AI Oracle - Standard Edition</title>
     <style>
         :root { --accent: #ffd700; --gold-glow: rgba(212, 175, 55, 0.4); --text: #e2e8f0; }
         body { font-family: "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 10px; line-height: 1.6; min-height: 100vh; color: var(--text); background: #020617; }
@@ -12,29 +12,29 @@
         header { padding: 30px 0; text-align: center; }
         .consult-area { background: rgba(15, 23, 42, 0.8); padding: 25px; border-radius: 20px; border: 1.5px solid var(--accent); box-shadow: 0 0 30px var(--gold-glow); }
         .api-key-box { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--accent); text-align: center; }
-        .api-input { background: #000; border: 1px solid var(--accent); color: #0f0; padding: 10px; width: 90%; border-radius: 6px; font-family: monospace; font-size: 0.8rem; }
+        .api-input { background: #000; border: 1px solid var(--accent); color: #0f0; padding: 12px; width: 90%; border-radius: 6px; font-family: monospace; font-size: 0.8rem; text-align: center; }
         textarea { width: 100%; height: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; padding: 15px; box-sizing: border-box; font-size: 1rem; margin-bottom: 15px; outline: none; }
         .btn-action { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; border: none; padding: 15px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem; }
         #ai-response { margin-top: 25px; display: none; background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); white-space: pre-wrap; line-height: 1.8; text-align: left; }
-        .error-msg { color: #ff6b6b; background: rgba(255,0,0,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.8rem; border: 1px solid #ff6b6b; }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <div id="display-date" style="font-weight:bold;">--月--日</div>
-        <div id="kanshi-today" style="margin-top:10px; font-weight:bold; color: var(--accent);">干支計算中...</div>
+        <div id="display-date" style="font-weight:bold; font-size: 1.2rem;">--月--日</div>
+        <div id="kanshi-today" style="margin-top:10px; font-weight:bold; color: var(--accent);">干支算出中...</div>
     </header>
 
     <div class="consult-area">
         <div class="api-key-box">
-            <div style="font-size:0.8rem; color:var(--accent); margin-bottom:8px; font-weight:bold;">1. Gemini APIキーを貼り付けて保存</div>
-            <input type="password" id="api-key" class="api-input" placeholder="AIzaSy...で始まるキーを貼り付け" onchange="saveKey()">
-            <div id="status" style="font-size:0.7rem; margin-top:5px; color:#0f0; display:none;">✓ キーを保存しました</div>
+            <div style="font-size:0.8rem; color:var(--accent); margin-bottom:8px; font-weight:bold;">1. APIキーを貼り付けて保存</div>
+            <input type="password" id="api-key" class="api-input" placeholder="キーを貼り付けてEnter" onchange="saveKey()">
+            <div id="status" style="font-size:0.7rem; margin-top:5px; color:#0f0; display:none;">✓ キーを記憶しました</div>
         </div>
 
-        <textarea id="user-input" placeholder="相談内容を入力..."></textarea>
-        <button id="submit-btn" class="btn-action" onclick="askAI()">星の導きを詳しく聞く</button>
+        <div style="font-weight:bold; color:var(--accent); margin-bottom:10px; text-align:center;">2. 相談内容を入力</div>
+        <textarea id="user-input" placeholder="例：今日はどんな日？ 連絡してもいい？"></textarea>
+        <button id="submit-btn" class="btn-action" onclick="askAI()">星の導きを聞く</button>
         <div id="ai-response"></div>
     </div>
 </div>
@@ -48,10 +48,7 @@
     function saveKey() {
         const val = document.getElementById('api-key').value.trim();
         localStorage.setItem('gemini_api_key', val);
-        document.getElementById('status').style.display = "block";
-        if (!val.startsWith("AIza")) {
-            alert("注意：入力されたキーが AIza から始まっていません。正しいキーか確認してください。");
-        }
+        document.getElementById('status').style.display = val ? "block" : "none";
     }
 
     window.onload = () => {
@@ -64,15 +61,16 @@
     };
 
     async function askAI() {
-        const key = localStorage.getItem('gemini_api_key');
+        const key = document.getElementById('api-key').value.trim();
         const input = document.getElementById('user-input').value;
         const resDiv = document.getElementById('ai-response');
-        if (!key) return alert("APIキーを上の枠に貼り付けてください");
+        if (!key) return alert("APIキーを入力してください");
 
         resDiv.style.display = "block";
-        resDiv.innerHTML = "思考中...";
+        resDiv.innerHTML = "星の配置を読み解いています...";
 
-        const prompt = `あなたは算命学鑑定士です。宿命（1979/11/30, 男, 辛丑/乙亥/己未）を元に答えて。相談：${input}`;
+        const todayK = document.getElementById('kanshi-today').innerText;
+        const prompt = `あなたは算命学鑑定士です。1979/11/30生まれ男性(辛丑)の相談に、今日(${todayK})の運勢を交えて答えて。相談：${input}`;
 
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
@@ -81,13 +79,14 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
             const data = await response.json();
+            
             if (data.error) {
-                resDiv.innerHTML = `<div class="error-msg">Googleからのエラー：<br>${data.error.message}<br><br>【解説】キーが間違っているか、有効化されていません。</div>`;
+                resDiv.innerHTML = "エラー: " + data.error.message;
             } else {
                 resDiv.innerHTML = data.candidates[0].content.parts[0].text;
             }
         } catch (e) {
-            resDiv.innerHTML = "通信エラー。";
+            resDiv.innerHTML = "通信エラーが発生しました。";
         }
     }
 
